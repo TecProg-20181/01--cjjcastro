@@ -16,19 +16,22 @@ typedef struct _image {
     unsigned int h;
 } Image;
 
+
 int max(int a, int b);
 int pixel_igual(Pixel p1, Pixel p2);
 
 Image escala_de_cinza(Image img);
 Image sepia(Image img);
+Image rotacionar(Image img);
 Image rotacionar90direita(Image img);
 Image espelhamento(Image img);
+Image inverter_cores(Image img);
 Image cortar_imagem(Image img);
 Image read_image();
 
 void blur(unsigned int h, unsigned short int pixel[512][512][3], unsigned int w);
-void inverter_cores(unsigned short int pixel[512][512][3], unsigned int w, unsigned int h);
 void print_image(Image img);
+
 
 int main() {
     Image img;
@@ -56,12 +59,7 @@ int main() {
                 break;
             }
             case 4: { // Rotacao
-                int quantas_vezes = 0;
-                scanf("%d", &quantas_vezes);
-                quantas_vezes %= 4;
-                for (int j = 0; j < quantas_vezes; ++j) {
-                    img = rotacionar90direita(img);
-                }
+                img = rotacionar(img);
                 break;
             }
             case 5: { // Espelhamento
@@ -69,7 +67,7 @@ int main() {
                 break;
             }
             case 6: { // Inversao de Cores
-                inverter_cores(img.pixel, img.w, img.h);
+                img = inverter_cores(img);
                 break;
             }
             case 7: { // Cortar Imagem
@@ -81,12 +79,9 @@ int main() {
     }
 
     print_image(img);
-    
+
     return 0;
 }
-
-
-//-------------------------------------------------------------------
 
 
 int max(int a, int b) {
@@ -156,6 +151,19 @@ void blur(unsigned int h, unsigned short int pixel[512][512][3], unsigned int w)
     }
 }
 
+Image rotacionar(Image img){
+    int quantas_vezes = 0;
+    int aux_i;
+
+    scanf("%d", &quantas_vezes);
+    quantas_vezes %= 4;
+    
+    for (aux_i = 0; aux_i < quantas_vezes; ++aux_i) {
+        img = rotacionar90direita(img);
+    }
+    return img;
+}
+
 Image rotacionar90direita(Image img) {
     Image rotacionada;
 
@@ -173,37 +181,36 @@ Image rotacionar90direita(Image img) {
     return rotacionada;
 }
 
-void inverter_cores(unsigned short int pixel[512][512][3],
-                    unsigned int w, unsigned int h) {
-    for (unsigned int i = 0; i < h; ++i) {
-        for (unsigned int j = 0; j < w; ++j) {
-            pixel[i][j][0] = 255 - pixel[i][j][0];
-            pixel[i][j][1] = 255 - pixel[i][j][1];
-            pixel[i][j][2] = 255 - pixel[i][j][2];
+Image inverter_cores(Image img) {
+    unsigned int aux_i, aux_j;
+
+    for (aux_i = 0; aux_i < img.h; ++aux_i) {
+        for (aux_j = 0; aux_j < img.w; ++aux_j) {
+            img.pixel[aux_i][aux_j][0] = 255 - img.pixel[aux_i][aux_j][0];
+            img.pixel[aux_i][aux_j][1] = 255 - img.pixel[aux_i][aux_j][1];
+            img.pixel[aux_i][aux_j][2] = 255 - img.pixel[aux_i][aux_j][2];
         }
     }
+    return img;
 }
 
 Image cortar_imagem(Image img) {
-    Image cortada;
+    Image img_cortada;
     int x, y;
-    int w, h;
 
     scanf("%d %d", &x, &y);
-    scanf("%d %d", &w, &h);
+    scanf("%d %d", &img_cortada.w, &img_cortada.h);
 
-    cortada.w = w;
-    cortada.h = h;
 
-    for(int i = 0; i < h; ++i) {
-        for(int j = 0; j < w; ++j) {
-            cortada.pixel[i][j][0] = img.pixel[i + y][j + x][0];
-            cortada.pixel[i][j][1] = img.pixel[i + y][j + x][1];
-            cortada.pixel[i][j][2] = img.pixel[i + y][j + x][2];
+    for(int i = 0; i < img_cortada.h; ++i) {
+        for(int j = 0; j < img_cortada.w; ++j) {
+            img_cortada.pixel[i][j][0] = img.pixel[i + y][j + x][0];
+            img_cortada.pixel[i][j][1] = img.pixel[i + y][j + x][1];
+            img_cortada.pixel[i][j][2] = img.pixel[i + y][j + x][2];
         }
     }
 
-    return cortada;
+    return img_cortada;
 }
 
 Image sepia(Image img){
