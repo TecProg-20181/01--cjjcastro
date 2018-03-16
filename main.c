@@ -18,36 +18,21 @@ typedef struct _image {
 
 int max(int a, int b);
 int pixel_igual(Pixel p1, Pixel p2);
-Image escala_de_cinza(Image img);
-void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w);
-Image rotacionar90direita(Image img);
-void inverter_cores(unsigned short int pixel[512][512][3],
-                    unsigned int w, unsigned int h);
-Image cortar_imagem(Image img, int x, int y, int w, int h);
 
+Image escala_de_cinza(Image img);
+Image sepia(Image img);
+Image blur(Image img);
+Image rotacionar90direita(Image img);
+void inverter_cores(unsigned short int pixel[512][512][3], unsigned int w, unsigned int h);
+Image cortar_imagem(Image img, int x, int y, int w, int h);
+Image read_image();
 
 
 int main() {
     Image img;
+    img = read_image();
 
-    // read type of image
-    char p3[4];
-    scanf("%s", p3);
-
-    // read width height and color of image
-    int max_color;
-    scanf("%u %u %d", &img.w, &img.h, &max_color);
-
-    // read all pixels of image
-    for (unsigned int i = 0; i < img.h; ++i) {
-        for (unsigned int j = 0; j < img.w; ++j) {
-            scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                                 &img.pixel[i][j][1],
-                                 &img.pixel[i][j][2]);
-
-        }
-    }
-
+    
     int n_opcoes;
     scanf("%d", &n_opcoes);
 
@@ -61,33 +46,11 @@ int main() {
                 break;
             }
             case 2: { // Filtro Sepia
-                for (unsigned int x = 0; x < img.h; ++x) {
-                    for (unsigned int j = 0; j < img.w; ++j) {
-                        unsigned short int pixel[3];
-                        pixel[0] = img.pixel[x][j][0];
-                        pixel[1] = img.pixel[x][j][1];
-                        pixel[2] = img.pixel[x][j][2];
-
-                        int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-                        int menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][0] = menor_r;
-
-                        p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-                        menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][1] = menor_r;
-
-                        p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-                        menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][2] = menor_r;
-                    }
-                }
-
+                img = sepia(img);
                 break;
             }
             case 3: { // Blur
-                int tamanho = 0;
-                scanf("%d", &tamanho);
-                blur(img.h, img.pixel, tamanho, img.w);
+                img = blur(img);
                 break;
             }
             case 4: { // Rotacao
@@ -207,31 +170,42 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
-void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
+Image blur(Image img) {
+    unsigned int h = img.h;
+    //unsigned short int pixel[512][512][3] = img.pixel;
+    unsigned int w = img.w;
+    int tamanho = 0;
+    Image blur_image;
+    blur_image.h = img.h;
+    blur_image.w = img.w;
+
+    scanf("%d", &tamanho);
+
     for (unsigned int i = 0; i < h; ++i) {
         for (unsigned int j = 0; j < w; ++j) {
             Pixel media = {0, 0, 0};
 
-            int menor_h = (h - 1 > i + T/2) ? i + T/2 : h - 1;
-            int min_w = (w - 1 > j + T/2) ? j + T/2 : w - 1;
-            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
-                for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_w; ++y) {
-                    media.r += pixel[x][y][0];
-                    media.g += pixel[x][y][1];
-                    media.b += pixel[x][y][2];
+            int menor_h = (h - 1 > i + tamanho/2) ? i + tamanho/2 : h - 1;
+            int min_w = (w - 1 > j + tamanho/2) ? j + tamanho/2 : w - 1;
+            for(int x = (0 > i - tamanho/2 ? 0 : i - tamanho/2); x <= menor_h; ++x) {
+                for(int y = (0 > j - tamanho/2 ? 0 : j - tamanho/2); y <= min_w; ++y) {
+                    media.r += img.pixel[x][y][0];
+                    media.g += img.pixel[x][y][1];
+                    media.b += img.pixel[x][y][2];
                 }
             }
 
             // printf("%u", media.r)
-            media.r /= T * T;
-            media.g /= T * T;
-            media.b /= T * T;
+            media.r /= tamanho * tamanho;
+            media.g /= tamanho * tamanho;
+            media.b /= tamanho * tamanho;
 
-            pixel[i][j][0] = media.r;
-            pixel[i][j][1] = media.g;
-            pixel[i][j][2] = media.b;
+            blur_image.pixel[i][j][0] = media.r;
+            blur_image.pixel[i][j][1] = media.g;
+            blur_image.pixel[i][j][2] = media.b;
         }
     }
+    return blur_image;
 }
 
 Image rotacionar90direita(Image img) {
@@ -277,4 +251,53 @@ Image cortar_imagem(Image img, int x, int y, int w, int h) {
     }
 
     return cortada;
+}
+
+Image sepia(Image img){
+    for (unsigned int x = 0; x < img.h; ++x) {
+        for (unsigned int j = 0; j < img.w; ++j) {
+            unsigned short int pixel[3];
+            pixel[0] = img.pixel[x][j][0];
+            pixel[1] = img.pixel[x][j][1];
+            pixel[2] = img.pixel[x][j][2];
+
+            int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+            int menor_r = (255 >  p) ? p : 255;
+            img.pixel[x][j][0] = menor_r;
+
+            p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+            menor_r = (255 >  p) ? p : 255;
+            img.pixel[x][j][1] = menor_r;
+
+            p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+            menor_r = (255 >  p) ? p : 255;
+            img.pixel[x][j][2] = menor_r;
+        }
+    }
+    return img;
+}
+
+Image read_image(){
+    Image img;
+    char p3[4];
+    int max_color;
+    unsigned int aux_i;
+    unsigned int aux_j;
+
+    // read type of image
+    scanf("%s", p3);
+
+    // read width height and color of image
+    scanf("%u %u %d", &img.w, &img.h, &max_color);
+
+    // read all pixels of image
+    for (aux_i = 0; aux_i < img.h; ++aux_i) {
+        for (aux_j = 0; aux_j < img.w; ++aux_j) {
+            scanf("%hu %hu %hu", &img.pixel[aux_i][aux_j][0],
+                                 &img.pixel[aux_i][aux_j][1],
+                                 &img.pixel[aux_i][aux_j][2]);
+
+        }
+    }
+    return img;
 }
