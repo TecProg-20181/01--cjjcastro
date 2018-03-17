@@ -5,9 +5,9 @@ cat lena/lena.ppm lena/inverter_cores.txt | ./photopobre > saida.ppm
 echo "Inverter cores:"
 diff lena/inverter_cores.ppm saida.ppm
 # Testando o método blur 15
-#cat lena/lena.ppm lena/blur_15.txt | ./photopobre > saida.ppm
-#echo "Blur 15:"
-#diff lena/blur_15.ppm saida.ppm
+cat lena/lena.ppm lena/blur_15.txt | ./photopobre > saida.ppm
+echo "Blur 15:"
+diff saida_blur.ppm saida.ppm
 
 cat lena/lena.ppm lena/cortar.txt | ./photopobre > saida.ppm
 echo "Cortar:"
