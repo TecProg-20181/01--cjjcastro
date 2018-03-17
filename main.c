@@ -1,16 +1,16 @@
 #include <stdio.h>
 
 typedef struct _pixel {
-    unsigned short int r;
-    unsigned short int g;
-    unsigned short int b;
+    unsigned short int red;
+    unsigned short int green;
+    unsigned short int blue;
 } Pixel;
 
 typedef struct _image {
     // [width][height][rgb]
-    // 0 -> r
-    // 1 -> g
-    // 2 -> b
+    // 0 -> red
+    // 1 -> green
+    // 2 -> blue
     unsigned short int pixel[512][512][3];
     unsigned int w;
     unsigned int h;
@@ -18,12 +18,12 @@ typedef struct _image {
 
 
 int max(int a, int b);
-int pixel_igual(Pixel p1, Pixel p2);
+int pixel_igual(Pixel pixel_a, Pixel pixel_b);
 
 Image escala_de_cinza(Image img);
 Image sepia(Image img);
 Image rotacionar(Image img);
-Image rotacionar90direita(Image img);
+Image rotacionar_90_direita(Image img);
 Image espelhamento(Image img);
 Image inverter_cores(Image img);
 Image cortar_imagem(Image img);
@@ -34,8 +34,7 @@ void print_image(Image img);
 
 
 int main() {
-    Image img;
-    img = read_image();
+    Image img = read_image();
 
     
     int n_opcoes;
@@ -90,10 +89,10 @@ int max(int a, int b) {
     return b;
 }
 
-int pixel_igual(Pixel p1, Pixel p2) {
-    if (p1.r == p2.r &&
-        p1.g == p2.g &&
-        p1.b == p2.b)
+int pixel_igual(Pixel pixel_a, Pixel pixel_b) {
+    if (pixel_a.red == pixel_b.red &&
+        pixel_a.green == pixel_b.green &&
+        pixel_a.blue == pixel_b.blue)
         return 1;
     return 0;
 }
@@ -133,20 +132,20 @@ void blur(unsigned int h, unsigned short int pixel[512][512][3], unsigned int w)
             int min_w = (w - 1 > j + tamanho/2) ? j + tamanho/2 : w - 1;
             for(int x = (0 > i - tamanho/2 ? 0 : i - tamanho/2); x <= menor_h; ++x) {
                 for(int y = (0 > j - tamanho/2 ? 0 : j - tamanho/2); y <= min_w; ++y) {
-                    media.r += pixel[x][y][0];
-                    media.g += pixel[x][y][1];
-                    media.b += pixel[x][y][2];
+                    media.red += pixel[x][y][0];
+                    media.green += pixel[x][y][1];
+                    media.blue += pixel[x][y][2];
                 }
             }
 
-            // printf("%u", media.r)
-            media.r /= tamanho * tamanho;
-            media.g /= tamanho * tamanho;
-            media.b /= tamanho * tamanho;
+            // printf("%u", media.red)
+            media.red /= tamanho * tamanho;
+            media.green /= tamanho * tamanho;
+            media.blue /= tamanho * tamanho;
 
-            pixel[i][j][0] = media.r;
-            pixel[i][j][1] = media.g;
-            pixel[i][j][2] = media.b;
+            pixel[i][j][0] = media.red;
+            pixel[i][j][1] = media.green;
+            pixel[i][j][2] = media.blue;
         }
     }
 }
@@ -159,12 +158,12 @@ Image rotacionar(Image img){
     quantas_vezes %= 4;
     
     for (aux_i = 0; aux_i < quantas_vezes; ++aux_i) {
-        img = rotacionar90direita(img);
+        img = rotacionar_90_direita(img);
     }
     return img;
 }
 
-Image rotacionar90direita(Image img) {
+Image rotacionar_90_direita(Image img) {
     Image rotacionada;
 
     rotacionada.w = img.h;
@@ -279,17 +278,17 @@ Image espelhamento(Image img){
             else x = img.h - 1 - i2;
 
             Pixel aux1;
-            aux1.r = img.pixel[i2][j][0];
-            aux1.g = img.pixel[i2][j][1];
-            aux1.b = img.pixel[i2][j][2];
+            aux1.red = img.pixel[i2][j][0];
+            aux1.green = img.pixel[i2][j][1];
+            aux1.blue = img.pixel[i2][j][2];
 
             img.pixel[i2][j][0] = img.pixel[x][y][0];
             img.pixel[i2][j][1] = img.pixel[x][y][1];
             img.pixel[i2][j][2] = img.pixel[x][y][2];
 
-            img.pixel[x][y][0] = aux1.r;
-            img.pixel[x][y][1] = aux1.g;
-            img.pixel[x][y][2] = aux1.b;
+            img.pixel[x][y][0] = aux1.red;
+            img.pixel[x][y][1] = aux1.green;
+            img.pixel[x][y][2] = aux1.blue;
         }
     }
     return img;
