@@ -1,30 +1,90 @@
+# constantes --------
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+# -------------------
+
 # Compilando o código
 gcc main.c -o photopobre
+
 # Testando o método inverter cores
-cat lena/lena.ppm lena/inverter_cores.txt | ./photopobre > saida.ppm
-echo "Inverter cores:"
-diff lena/inverter_cores.ppm saida.ppm
-# Testando o método blur 15
-#cat lena/lena.ppm lena/blur_15.txt | ./photopobre > saida.ppm
-#echo "Blur 15:"
-#diff saida_blur.ppm saida.ppm
-# Testando o método cortar
-cat lena/lena.ppm lena/cortar.txt | ./photopobre > saida.ppm
-echo "Cortar:"
-diff lena/cortar.ppm saida.ppm
-# Testando o método escala cinza
-cat lena/lena.ppm lena/escala_cinza.txt | ./photopobre > saida.ppm
-echo "Escala cinza:"
-diff lena/escala_cinza.ppm saida.ppm
-# Testando o método espelhamento vertical
-cat lena/lena.ppm lena/espelhamento_vertical.txt | ./photopobre > saida.ppm
-echo "Espelhamento vertical:"
-diff lena/espelhamento_vertical.ppm saida.ppm
-# Testando o método rotação
-cat lena/lena.ppm lena/rotacao_90.txt | ./photopobre > saida.ppm
-echo "Rotacao 90:"
-diff lena/rotacao_90.ppm saida.ppm
-# Testando o método sepia
-cat lena/lena.ppm lena/sepia.txt | ./photopobre > saida.ppm
-echo "Sepia:"
-diff lena/sepia.ppm saida.ppm
+cat lena/lena.ppm lena/inverter_cores.txt | ./photopobre > test/inverter_cores.ppm
+diff lena/inverter_cores.ppm test/inverter_cores.ppm > test/inverter_cores.log
+FILESIZE=$(stat -c%s test/inverter_cores.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}inverter_cores está diferente"
+               echo -e "${RED}cheque test/inverter_cores.log"
+		else
+        		echo -e "${GREEN}inverter_cores está ok"
+        	fi
+
+# Testando o método blur com parâmetro 15
+cat lena/lena.ppm lena/blur_15.txt | ./photopobre > test/blur_15.ppm
+diff lena/blur_15.ppm test/blur_15.ppm > test/blur_15.log
+FILESIZE=$(stat -c%s test/blur_15.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}blur_15 está diferente"
+               echo -e "${RED}cheque test/blur_15.log"
+		else
+        		echo -e "${GREEN}blur_15 está ok"
+        	fi
+
+# Testando o método de corte
+cat lena/lena.ppm lena/cortar.txt | ./photopobre > test/cortar.ppm
+diff lena/cortar.ppm test/cortar.ppm > test/cortar.log
+FILESIZE=$(stat -c%s test/cortar.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}cortar está diferente"
+               echo -e "${RED}cheque test/cortar.log"
+		else
+        		# Write the age to a new file.
+        		echo -e "${GREEN}cortar está ok"
+        	fi
+
+# Testando método de escala cinza
+cat lena/lena.ppm lena/escala_cinza.txt | ./photopobre > test/escala_cinza.ppm
+diff lena/escala_cinza.ppm test/escala_cinza.ppm > test/escala_cinza.log
+FILESIZE=$(stat -c%s test/escala_cinza.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}escala_cinza está diferente"
+               echo -e "${RED}cheque test/escala_cinza.log"
+		else
+        		# Write the age to a new file.
+        		echo -e "${GREEN}escala_cinza está ok"
+        	fi
+
+# Testando método de espelhamento vertical
+cat lena/lena.ppm lena/espelhamento_vertical.txt | ./photopobre > test/espelhamento_vertical.ppm
+diff lena/espelhamento_vertical.ppm test/espelhamento_vertical.ppm > test/espelhamento_vertical.log
+FILESIZE=$(stat -c%s test/espelhamento_vertical.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}espelhamento_vertical está diferente"
+               echo -e "${RED}cheque test/espelhamento_vertical.log"
+		else
+        		# Write the age to a new file.
+        		echo -e "${GREEN}espelhamento_vertical está ok"
+        	fi
+
+# Testando método de rotação 90
+cat lena/lena.ppm lena/rotacao_90.txt | ./photopobre > test/rotacao_90.ppm
+diff lena/rotacao_90.ppm test/rotacao_90.ppm > test/rotacao_90.log
+FILESIZE=$(stat -c%s test/rotacao_90.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}rotacao_90 está diferente"
+               echo -e "${RED}cheque test/rotacao_90.log"
+		else
+        		# Write the age to a new file.
+        		echo -e "${GREEN}rotacao_90 está ok"
+        	fi
+
+# Testando método de sepia
+cat lena/lena.ppm lena/sepia.txt | ./photopobre > test/sepia.ppm
+diff lena/sepia.ppm test/sepia.ppm > test/sepia.log
+FILESIZE=$(stat -c%s test/sepia.log)
+if [ "$FILESIZE" -gt 0 ]; then
+			echo -e "${RED}sepia está diferente"
+               echo -e "${RED}cheque test/sepia.log"
+		else
+        		# Write the age to a new file.
+        		echo -e "${GREEN}sepia está ok"
+        	fi
