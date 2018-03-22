@@ -11,7 +11,7 @@ typedef struct _pixel {
 } Pixel;
 
 typedef struct _image {
-    Pixel pixel[512][512]; // [width][height][rgb]
+    Pixel pixel[512][512]; // [width][height]
     unsigned int width;
     unsigned int height;
 } Image;
@@ -31,6 +31,8 @@ Image read_image();
 
 void blur(Image img, Pixel pixel[512][512]);
 void print_image(Image img);
+
+Pixel invert_pixel(Pixel pixel);
 
 
 int main() {
@@ -94,6 +96,15 @@ Image choose_rotate(Image img){
         img = rotate_90_right(img);
     }
     return img;
+}
+
+Pixel invert_pixel(Pixel pixel){
+    
+    pixel.red = 255 - pixel.red;
+    pixel.green = 255 - pixel.green;
+    pixel.blue = 255 - pixel.blue;
+
+    return pixel;
 }
 
 // edit the image ----------------------------
@@ -164,14 +175,15 @@ Image rotate_90_right(Image img) {
     return rotated;
 }
 
-Image invert_colors(Image img) {
+Image invert_colors(Image img) 
+{
     unsigned int aux_i, aux_j;
 
-    for (aux_i = 0; aux_i < img.height; ++aux_i) {
-        for (aux_j = 0; aux_j < img.width; ++aux_j) {
-            img.pixel[aux_i][aux_j].red = 255 - img.pixel[aux_i][aux_j].red;
-            img.pixel[aux_i][aux_j].green = 255 - img.pixel[aux_i][aux_j].green;
-            img.pixel[aux_i][aux_j].blue = 255 - img.pixel[aux_i][aux_j].blue;
+    for (aux_i = 0; aux_i < img.height; ++aux_i) 
+    {
+        for (aux_j = 0; aux_j < img.width; ++aux_j) 
+        {
+            img.pixel[aux_i][aux_j] = invert_pixel(img.pixel[aux_i][aux_j]);
         }
     }
     return img;
@@ -234,15 +246,19 @@ Image mirroring(Image img){
 
     scanf("%d", &horizontal);
 
-    if (horizontal == 1) width /= 2;
-    else height /= 2;
+    if (horizontal == 1) 
+        width /= 2;
+    else 
+        height /= 2;
 
     for (aux_i = 0; aux_i < height; ++aux_i) {
         for (aux_j = 0; aux_j < width; ++aux_j) {
             int x = aux_i, y = aux_j;
 
-            if (horizontal == 1) y = img.width - 1 - aux_j;
-            else x = img.height - 1 - aux_i;
+            if (horizontal == 1)
+                y = img.width - 1 - aux_j;
+            else
+                x = img.height - 1 - aux_i;
 
             pixel_aux.red = img.pixel[aux_i][aux_j].red;
             pixel_aux.green = img.pixel[aux_i][aux_j].green;
