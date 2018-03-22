@@ -18,6 +18,7 @@ typedef struct _image
 
 int max(int a, int b);
 int pixel_igual(Pixel pixel_a, Pixel pixel_b);
+unsigned short int average(Pixel pixel);
 
 Image grey_scale(Image img);
 Image sepia(Image img);
@@ -32,6 +33,7 @@ void blur(Image img, Pixel pixel[512][512]);
 void print_image(Image img);
 
 Pixel invert_pixel(Pixel pixel);
+Pixel pixel_average(Pixel pixel);
 
 
 int main()
@@ -119,27 +121,33 @@ Pixel invert_pixel(Pixel pixel)
     return pixel;
 }
 
-unsigned short int pixel_average(Pixel pixel)
+unsigned short int average(Pixel pixel)
 {
     return (pixel.red + pixel.green + pixel.blue)/3;
+}
+
+Pixel pixel_average(Pixel pixel)
+{
+    Pixel pixel_aux;
+
+    pixel_aux.red = average(pixel);
+    pixel_aux.green = average(pixel);
+    pixel_aux.blue = average(pixel);
+
+    return pixel_aux;
 }
 
 // edit the image ----------------------------
 
 Image grey_scale(Image img)
 {
-    int average;
     unsigned int aux_i, aux_j;
 
     for (aux_i = 0; aux_i < img.height; ++aux_i)
     {
         for (aux_j = 0; aux_j < img.width; ++aux_j)
         {
-            average = pixel_average(img.pixel[aux_i][aux_j]);
-            
-            img.pixel[aux_i][aux_j].red = average;
-            img.pixel[aux_i][aux_j].green = average;
-            img.pixel[aux_i][aux_j].blue = average;
+            img.pixel[aux_i][aux_j] = pixel_average(img.pixel[aux_i][aux_j]);
         }
     }
 
