@@ -182,9 +182,7 @@ void blur(Image img, Pixel pixel[512][512])
             media.green /= size * size;
             media.blue /= size * size;
 
-            pixel[i][j].red = media.red;
-            pixel[i][j].green = media.green;
-            pixel[i][j].blue = media.blue;
+            pixel[i][j] = media;
         }
     }
 }
