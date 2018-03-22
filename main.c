@@ -1,8 +1,5 @@
 #include <stdio.h>
 
-#define RED 0
-#define GREEN 1
-#define BLUE 2
 
 typedef struct _pixel
 {
@@ -21,6 +18,7 @@ typedef struct _image
 
 int max(int a, int b);
 int pixel_igual(Pixel pixel_a, Pixel pixel_b);
+unsigned short int average(Pixel pixel);
 
 Image grey_scale(Image img);
 Image sepia(Image img);
@@ -35,6 +33,7 @@ void blur(Image img, Pixel pixel[512][512]);
 void print_image(Image img);
 
 Pixel invert_pixel(Pixel pixel);
+Pixel pixel_average(Pixel pixel);
 
 
 int main()
@@ -122,27 +121,33 @@ Pixel invert_pixel(Pixel pixel)
     return pixel;
 }
 
-unsigned short int pixel_average(Pixel pixel)
+unsigned short int average(Pixel pixel)
 {
     return (pixel.red + pixel.green + pixel.blue)/3;
+}
+
+Pixel pixel_average(Pixel pixel)
+{
+    Pixel pixel_aux;
+
+    pixel_aux.red = average(pixel);
+    pixel_aux.green = average(pixel);
+    pixel_aux.blue = average(pixel);
+
+    return pixel_aux;
 }
 
 // edit the image ----------------------------
 
 Image grey_scale(Image img)
 {
-    int average;
     unsigned int aux_i, aux_j;
 
     for (aux_i = 0; aux_i < img.height; ++aux_i)
     {
         for (aux_j = 0; aux_j < img.width; ++aux_j)
         {
-            average = pixel_average(img.pixel[aux_i][aux_j]);
-            
-            img.pixel[aux_i][aux_j].red = average;
-            img.pixel[aux_i][aux_j].green = average;
-            img.pixel[aux_i][aux_j].blue = average;
+            img.pixel[aux_i][aux_j] = pixel_average(img.pixel[aux_i][aux_j]);
         }
     }
 
@@ -195,9 +200,7 @@ Image rotate_90_right(Image img)
     {
         for (int j = rotated.width - 1, x = 0; j >= 0; --j, ++x)
         {
-            rotated.pixel[i][j].red = img.pixel[x][y].red;
-            rotated.pixel[i][j].green = img.pixel[x][y].green;
-            rotated.pixel[i][j].blue = img.pixel[x][y].blue;
+            rotated.pixel[i][j] = img.pixel[x][y];
         }
     }
 
@@ -232,9 +235,7 @@ Image crop_image(Image img)
     {
         for(aux_j = 0; aux_j < img_cropped.width; ++aux_j)
         {
-            img_cropped.pixel[aux_i][aux_j].red = img.pixel[aux_i + y][aux_j + x].red;
-            img_cropped.pixel[aux_i][aux_j].green = img.pixel[aux_i + y][aux_j + x].green;
-            img_cropped.pixel[aux_i][aux_j].blue = img.pixel[aux_i + y][aux_j + x].blue;
+            img_cropped.pixel[aux_i][aux_j] = img.pixel[aux_i + y][aux_j + x];
         }
     }
 
@@ -243,7 +244,7 @@ Image crop_image(Image img)
 
 Image sepia(Image img)
 {
-    unsigned short int pixel[3];
+    Pixel pixel;
     unsigned int aux_i, aux_j;
     int p;
     int menor_r;
@@ -252,19 +253,17 @@ Image sepia(Image img)
     {
         for (aux_j = 0; aux_j < img.width; ++aux_j)
         {    
-            pixel[RED] = img.pixel[aux_i][aux_j].red;
-            pixel[GREEN] = img.pixel[aux_i][aux_j].green;
-            pixel[BLUE] = img.pixel[aux_i][aux_j].blue;
-
-            p =  pixel[RED] * .393 + pixel[GREEN] * .769 + pixel[BLUE] * .189;
+            pixel = img.pixel[aux_i][aux_j];
+            
+            p =  pixel.red * .393 + pixel.green * .769 + pixel.blue * .189;
             menor_r = (255 >  p) ? p : 255;
             img.pixel[aux_i][aux_j].red = menor_r;
 
-            p =  pixel[RED] * .349 + pixel[GREEN] * .686 + pixel[BLUE] * .168;
+            p =  pixel.red * .349 + pixel.green * .686 + pixel.blue * .168;
             menor_r = (255 >  p) ? p : 255;
             img.pixel[aux_i][aux_j].green = menor_r;
 
-            p =  pixel[RED] * .272 + pixel[GREEN] * .534 + pixel[BLUE] * .131;
+            p =  pixel.red * .272 + pixel.green * .534 + pixel.blue * .131;
             menor_r = (255 >  p) ? p : 255;
             img.pixel[aux_i][aux_j].blue = menor_r;
         }
@@ -297,17 +296,11 @@ Image mirroring(Image img)
             else
                 x = img.height - 1 - aux_i;
 
-            pixel_aux.red = img.pixel[aux_i][aux_j].red;
-            pixel_aux.green = img.pixel[aux_i][aux_j].green;
-            pixel_aux.blue = img.pixel[aux_i][aux_j].blue;
+            pixel_aux = img.pixel[aux_i][aux_j];
 
-            img.pixel[aux_i][aux_j].red = img.pixel[x][y].red;
-            img.pixel[aux_i][aux_j].green = img.pixel[x][y].green;
-            img.pixel[aux_i][aux_j].blue = img.pixel[x][y].blue;
+            img.pixel[aux_i][aux_j] = img.pixel[x][y];
 
-            img.pixel[x][y].red = pixel_aux.red;
-            img.pixel[x][y].green = pixel_aux.green;
-            img.pixel[x][y].blue = pixel_aux.blue;
+            img.pixel[x][y] = pixel_aux;
         }
     }
     return img;
