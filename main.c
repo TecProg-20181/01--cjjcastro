@@ -34,6 +34,8 @@ void print_image(Image img);
 
 Pixel invert_pixel(Pixel pixel);
 Pixel pixel_average(Pixel pixel);
+Pixel increment_pixel(Pixel media, Pixel pixel);
+Pixel div_pixel(Pixel media, int size);
 
 
 int main()
@@ -137,6 +139,23 @@ Pixel pixel_average(Pixel pixel)
     return pixel_aux;
 }
 
+Pixel increment_pixel(Pixel media, Pixel pixel)
+{
+    media.red += pixel.red;
+    media.green += pixel.green;
+    media.blue += pixel.blue;
+
+    return media;
+}
+
+Pixel div_pixel(Pixel media, int size)
+{
+    media.red /= size;
+    media.green /= size;
+    media.blue /= size;
+
+    return media;
+}
 // edit the image ----------------------------
 
 Image grey_scale(Image img)
@@ -171,16 +190,12 @@ void blur(Image img, Pixel pixel[512][512])
             {
                 for(int y = (0 > j - size/2 ? 0 : j - size/2); y <= min_w; y++)
                 {
-                    media.red += pixel[x][y].red;
-                    media.green += pixel[x][y].green;
-                    media.blue += pixel[x][y].blue;
+                    media = increment_pixel(media, pixel[x][y]);
                 }
             }
 
-            media.red /= size * size;
-            media.green /= size * size;
-            media.blue /= size * size;
-
+            media = div_pixel(media, size * size);
+            
             pixel[i][j] = media;
         }
     }
