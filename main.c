@@ -177,7 +177,6 @@ void blur(Image img, Pixel pixel[512][512])
                 }
             }
 
-            // printf("%u", media.red)
             media.red /= size * size;
             media.green /= size * size;
             media.blue /= size * size;
